@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>העלאת יצירה</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <style>
+        body { font-family: Arial; text-align: center; background: #f0f0f0; padding: 20px; }
+        select, input, button { width: 100%; padding: 15px; margin: 10px 0; font-size: 18px; border-radius: 10px; border: 1px solid #ccc; }
+        button { background: #0038b8; color: white; font-weight: bold; border: none; cursor: pointer; }
+        .admin-link { margin-top: 50px; display: block; color: #666; text-decoration: none; font-size: 14px; border: 1px dashed #ccc; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>באיזו עיר אתם גרים?</h1>
+    <select id="city">
+        <option>תל אביב</option><option>ירושלים</option><option>חיפה</option>
+        <option>באר שבע</option><option>מודיעין</option><option>אילת</option>
+        <option>צפת</option><option>טבריה</option><option>נתניה</option><option>אשדוד</option>
+    </select>
+    <input type="file" id="photo" accept="image/*">
+    <button onclick="upload()">שלח למפה! 🚀</button>
+
+    <a href="map.html" class="admin-link">לחץ כאן כדי לפתוח את המפה (למקרן בלבד)</a>
+
+    <script>
+        const firebaseConfig = { databaseURL: "https://bubot-mekomiot-default-rtdb.firebaseio.com" };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        function upload() {
+            const file = document.getElementById('photo').files[0];
+            const city = document.getElementById('city').value;
+            if (!file) return alert("נא לבחור תמונה");
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                database.ref('uploads').push({
+                    city: city,
+                    image: e.target.result,
+                    time: Date.now()
+                }).then(() => { alert("התמונה עלתה למפה!"); });
+            };
+            reader.readAsDataURL(file);
+        }
+    </script>
+</body>
+</html>
