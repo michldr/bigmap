@@ -18,7 +18,7 @@
         background-image: url('israel.png');
         background-repeat: no-repeat;
         background-position: center;
-        background-size: contain; /* המפה תהיה הכי גדולה שאפשר בלי להיחתך */
+        background-size: contain; 
     }
 
     #sign { 
@@ -29,9 +29,34 @@
     }
 
     .photo-card { 
-        position: absolute; width: 120px; /* תמונות קצת יותר גדולות */
-        background: white; border: 2px solid #fff; border-radius: 5px; 
-        box-shadow: 0 10px 20px rgba(0,0,0,0.2); animation: pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: absolute; 
+        width: 110px; /* גודל התמונה על המפה */
+        background: white; 
+        border: 2px solid #fff; 
+        border-radius: 5px; 
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2); 
+        transition: all 0.5s ease;
+        z-index: 10;
+        animation: pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .photo-card img {
+        width: 100%; 
+        display: block; 
+        border-radius: 3px 3px 0 0;
+    }
+
+    .city-tag {
+        text-align: center;
+        font-size: 12px;
+        font-weight: bold;
+        padding: 4px;
+        color: #333;
+    }
+
+    @keyframes pop {
+        0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+        100% { transform: scale(1) rotate(var(--rotation)); opacity: 1; }
     }
 </style>
 </head>
@@ -44,7 +69,6 @@
         const firebaseConfig = { databaseURL: "https://bubot-mekomiot-default-rtdb.firebaseio.com" };
         firebase.initializeApp(firebaseConfig);
         
-        // מיקומים גנריים על המפה - תוכלי להזיז אותם אם צריך
         const cityPositions = { 
             "צפת": {top:"15%",left:"55%"}, "טבריה": {top:"22%",left:"56%"}, 
             "חיפה": {top:"20%",left:"50%"}, "נתניה": {top:"35%",left:"48%"}, 
@@ -56,13 +80,28 @@
         firebase.database().ref('uploads').on('child_added', (snapshot) => {
             const data = snapshot.val();
             const pos = cityPositions[data.city] || { top: "50%", left: "50%" };
+            
+            // יצירת פיזור אקראי כדי שתמונות לא ייערמו
+            const randomX = Math.floor(Math.random() * 50) - 25; // סטייה של 25 פיקסלים
+            const randomY = Math.floor(Math.random() * 50) - 25;
+            const randomRot = Math.floor(Math.random() * 20) - 10; // סיבוב קל
+
             const card = document.createElement('div');
             card.className = 'photo-card';
-            card.style.top = pos.top; card.style.left = pos.left;
-            card.innerHTML = `<img src="${data.image}" style="width:100%; display:block; border-radius:6px 6px 0 0;"><div class="city-tag">${data.city}</div>`;
+            
+            // שימוש ב-calc כדי לשמור על האחוזים פלוס הסטייה האקראית
+            card.style.top = `calc(${pos.top} + ${randomY}px)`;
+            card.style.left = `calc(${pos.left} + ${randomX}px)`;
+            card.style.setProperty('--rotation', `${randomRot}deg`);
+            card.style.transform = `rotate(${randomRot}deg)`;
+
+            card.innerHTML = `
+                <img src="${data.image}">
+                <div class="city-tag">${data.city}</div>
+            `;
+            
             document.getElementById('map-container').appendChild(card);
         });
     </script>
 </body>
 </html>
-
