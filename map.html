@@ -131,28 +131,38 @@
             div.className = 'user-photo-wrapper';
             div.setAttribute('data-city', data.city);
 
-            // לוגיקת מקבץ: אם יש כבר אנשים בעיר, נזיז אותם קצת הצידה במעגל קטן
+          // לוגיקת כיווץ דינמי ומעגל
             const count = activeCitiesCount[data.city] || 0;
             activeCitiesCount[data.city] = count + 1;
-
-       // חישוב מיקום מעגלי חופף - החלפה לשורות 138-150
-            const radius = count === 0 ? 0 : 2.2; 
-            const angle = (count * 45) * (Math.PI / 180); 
             
+            // חישוב אחוז הקטנה: 10% לכל תמונה נוספת (מינימום 50% מהגודל המקורי)
+            const scaleFactor = Math.max(0.5, 1 - (count * 0.1));
+            
+            // עדכון כל התמונות הקיימות מאותה עיר לגודל החדש
+            document.querySelectorAll(`.user-photo-wrapper[data-city="${data.city}"] img`).forEach(existingImg => {
+                existingImg.style.transform = `scale(${scaleFactor})`;
+            });
+
+            // מיקום במעגל
+            const radius = count === 0 ? 0 : 3.5; 
+            const angle = (count * 60) * (Math.PI / 180);
             const offsetX = Math.cos(angle) * radius;
             const offsetY = Math.sin(angle) * radius;
 
             div.style.left = (coords.left + offsetX) + '%';
             div.style.top = (coords.top + offsetY) + '%';
             div.style.zIndex = 100 + count;
+
             div.innerHTML = `
-                <img src="${data.image}">
+                <img src="${data.image}" style="transform: scale(${scaleFactor})">
                 <span class="city-name">${data.city}</span>
             `;
+            layer.appendChild(div);
             layer.appendChild(div);
         }
     });
 </script>
 </body>
 </html>
+
 
