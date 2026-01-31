@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>מפת ארץ ישראל - אליפסות מנצנצות</title>
+    <title>מפת ארץ ישראל - מקבצי אליפסות</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
@@ -15,24 +15,22 @@
         .map-container { 
             position: relative; 
             display: inline-block; 
-            border: 5px solid #FFD700; 
+            border: 2px solid #444; 
             border-radius: 15px; 
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
         }
 
         #main-map { height: 92vh; display: block; border-radius: 10px; }
 
-        /* אנימציית כניסה והבהוב זהב בולט */
-        @keyframes superGlow {
-            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; filter: drop-shadow(0 0 5px #FFD700); }
-            50% { filter: drop-shadow(0 0 30px #FFD700); }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; filter: drop-shadow(0 0 10px #FFD700); }
+        /* אנימציית כניסה עדינה */
+        @keyframes fadeIn {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
         }
 
-        /* אנימציית נצנוץ קבועה */
-        @keyframes constantTwinkle {
-            0%, 100% { filter: drop-shadow(0 0 8px #FFD700); }
-            50% { filter: drop-shadow(0 0 25px #FFD700); }
+        /* נצנוץ לבן עדין */
+        @keyframes subtleWhiteTwinkle {
+            0%, 100% { filter: drop-shadow(0 0 2px rgba(255,255,255,0.3)); }
+            50% { filter: drop-shadow(0 0 10px rgba(255,255,255,0.7)); }
         }
 
         .user-photo-wrapper {
@@ -40,36 +38,36 @@
             transform: translate(-50%, -50%);
             text-align: center;
             z-index: 100;
-            animation: superGlow 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            animation: fadeIn 0.5s ease-out forwards;
         }
 
         .user-photo-wrapper img { 
-            width: 80px; 
-            height: 110px; 
+            width: 75px; 
+            height: 100px; 
             object-fit: cover; 
-            border-radius: 50%; /* אליפסה מושלמת */
-            border: 3px solid #FFD700;
-            animation: constantTwinkle 2s infinite ease-in-out;
+            border-radius: 50%; 
+            border: 2px solid #fff;
+            animation: subtleWhiteTwinkle 3s infinite ease-in-out;
+            transition: all 0.3s ease;
         }
 
-        /* סגנון למשתמש שני מאותה עיר */
-        .user-photo-wrapper.secondary img {
-            width: 55px;
-            height: 75px;
-            border-color: #ffffff;
+        /* עיצוב למקבץ (כשיש כמה בעיר אחת) */
+        .user-photo-wrapper.in-cluster img {
+            width: 50px;
+            height: 70px;
+            border-width: 1.5px;
         }
 
         .city-name {
             display: block; 
-            background: rgba(0, 0, 0, 0.8); 
-            color: #FFD700; /* טקסט זהוב */
-            padding: 3px 10px; 
-            border-radius: 12px; 
-            font-size: 13px; 
+            background: rgba(255, 255, 255, 0.9); 
+            color: #333; 
+            padding: 1px 6px; 
+            border-radius: 8px; 
+            font-size: 10px; 
             font-weight: bold;
-            margin-top: 6px;
+            margin-top: 3px;
             white-space: nowrap;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
         }
     </style>
 </head>
@@ -107,7 +105,7 @@
         "אילת": { left: 47.1, top: 91.4 }
     };
 
-    const activeCities = {};
+    const activeCitiesCount = {};
 
     database.ref('uploads').on('child_added', (snapshot) => {
         const data = snapshot.val();
@@ -116,31 +114,35 @@
         if (coords) {
             const layer = document.getElementById('photos-layer');
             
-            // הגבלה ל-30 אליפסות
+            // ניהול תור 30 בובות
             if (layer.children.length >= 30) {
-                const firstChild = layer.firstChild;
-                const oldCity = firstChild.getAttribute('data-city');
-                activeCities[oldCity] = Math.max(0, (activeCities[oldCity] || 1) - 1);
-                layer.removeChild(firstChild);
+                const first = layer.firstChild;
+                const cityKey = first.getAttribute('data-city');
+                activeCitiesCount[cityKey]--;
+                layer.removeChild(first);
             }
 
             const div = document.createElement('div');
             div.className = 'user-photo-wrapper';
             div.setAttribute('data-city', data.city);
 
-            let offsetL = 0; let offsetT = 0;
-            
-            if (activeCities[data.city] > 0) {
-                div.classList.add('secondary');
-                offsetL = (Math.random() > 0.5 ? 4 : -4); 
-                offsetT = (Math.random() > 0.5 ? 4 : -4);
+            // לוגיקת מקבץ: אם יש כבר אנשים בעיר, נזיז אותם קצת הצידה במעגל קטן
+            const count = activeCitiesCount[data.city] || 0;
+            activeCitiesCount[data.city] = count + 1;
+
+            if (count > 0) {
+                div.classList.add('in-cluster');
+                // חישוב מיקום מעגלי קטן סביב הנקודה המרכזית
+                const angle = count * 1.2; // זווית משתנה לכל אחד נוסף
+                const radius = 2.5; // רדיוס קטן ליצירת חפיפה
+                div.style.left = (coords.left + Math.cos(angle) * radius) + '%';
+                div.style.top = (coords.top + Math.sin(angle) * radius) + '%';
+                div.style.zIndex = 100 + count; // החדש יותר יהיה מעט מעל
+            } else {
+                div.style.left = coords.left + '%';
+                div.style.top = coords.top + '%';
             }
 
-            activeCities[data.city] = (activeCities[data.city] || 0) + 1;
-
-            div.style.left = (coords.left + offsetL) + '%';
-            div.style.top = (coords.top + offsetT) + '%';
-            
             div.innerHTML = `
                 <img src="${data.image}">
                 <span class="city-name">${data.city}</span>
