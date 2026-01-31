@@ -21,17 +21,22 @@
 
         #main-map { height: 92vh; display: block; border-radius: 10px; }
 
-        /* אנימציית כניסה עדינה */
-        @keyframes fadeIn {
-            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        }
+     /* נצנוץ לבן עדין */
+@keyframes subtleWhiteTwinkle {
+    0%, 100% { filter: drop-shadow(0 0 3px rgba(255,255,255,0.4)); }
+    50% { filter: drop-shadow(0 0 10px rgba(255,255,255,0.8)); }
+}
 
-        /* נצנוץ לבן עדין */
-        @keyframes subtleWhiteTwinkle {
-            0%, 100% { filter: drop-shadow(0 0 2px rgba(255,255,255,0.3)); }
-            50% { filter: drop-shadow(0 0 10px rgba(255,255,255,0.7)); }
-        }
+.user-photo-wrapper img { 
+    width: 65px; 
+    height: 90px; 
+    object-fit: cover; 
+    border-radius: 50%; /* אליפסה */
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    animation: subtleWhiteTwinkle 3s infinite ease-in-out;
+    background: #000;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.5); /* צל ליצירת עומק בחפיפה */
+}
 
         .user-photo-wrapper {
             position: absolute;
@@ -130,19 +135,16 @@
             const count = activeCitiesCount[data.city] || 0;
             activeCitiesCount[data.city] = count + 1;
 
-            if (count > 0) {
-                div.classList.add('in-cluster');
-                // חישוב מיקום מעגלי קטן סביב הנקודה המרכזית
-                const angle = count * 1.2; // זווית משתנה לכל אחד נוסף
-                const radius = 2.5; // רדיוס קטן ליצירת חפיפה
-                div.style.left = (coords.left + Math.cos(angle) * radius) + '%';
-                div.style.top = (coords.top + Math.sin(angle) * radius) + '%';
-                div.style.zIndex = 100 + count; // החדש יותר יהיה מעט מעל
-            } else {
-                div.style.left = coords.left + '%';
-                div.style.top = coords.top + '%';
-            }
+       // חישוב מיקום מעגלי חופף - החלפה לשורות 138-150
+            const radius = count === 0 ? 0 : 2.2; 
+            const angle = (count * 45) * (Math.PI / 180); 
+            
+            const offsetX = Math.cos(angle) * radius;
+            const offsetY = Math.sin(angle) * radius;
 
+            div.style.left = (coords.left + offsetX) + '%';
+            div.style.top = (coords.top + offsetY) + '%';
+            div.style.zIndex = 100 + count;
             div.innerHTML = `
                 <img src="${data.image}">
                 <span class="city-name">${data.city}</span>
@@ -153,3 +155,4 @@
 </script>
 </body>
 </html>
+
