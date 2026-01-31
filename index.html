@@ -40,58 +40,128 @@
             text-align: center;
         }
 
-        h1 { 
-            color: var(--deep-pink); 
-            font-size: 32px; 
-            font-weight: 900;
-            margin-bottom: 35px;
-        }
-
+        h1 { color: var(--deep-pink); font-size: 32px; font-weight: 900; margin-bottom: 35px; }
         .field-group { margin-bottom: 25px; }
 
         select { 
-            width: 100%; 
-            padding: 18px; 
-            border-radius: 25px; 
-            font-size: 18px; 
-            font-family: 'Varela Round', sans-serif;
-            border: 3px solid var(--bright-blue);
-            background: var(--pure-white);
-            color: #444;
-            text-align: center;
-            font-weight: bold;
+            width: 100%; padding: 18px; border-radius: 25px; font-size: 18px; 
+            font-family: 'Varela Round', sans-serif; border: 3px solid var(--bright-blue);
+            background: var(--pure-white); color: #444; font-weight: bold;
         }
 
         .btn-file {
-            background: var(--soft-pink);
-            color: var(--pure-white);
-            padding: 22px;
-            border-radius: 25px;
-            display: block;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 19px;
-            border: 4px solid var(--pure-white);
+            background: var(--soft-pink); color: var(--pure-white); padding: 22px;
+            border-radius: 25px; display: block; cursor: pointer; font-weight: bold;
+            font-size: 19px; border: 4px solid var(--pure-white);
             box-shadow: 0 8px 20px rgba(255, 133, 162, 0.3);
         }
 
         input[type=file] { display: none; }
 
         .send-btn { 
-            width: 100%;
-            padding: 20px;
-            border-radius: 25px;
-            background: var(--bright-blue); 
-            color: var(--pure-white); 
-            border: 4px solid var(--pure-white);
-            font-size: 22px;
-            font-weight: 800; 
-            cursor: pointer; 
+            width: 100%; padding: 20px; border-radius: 25px; background: var(--bright-blue); 
+            color: var(--pure-white); border: 4px solid var(--pure-white);
+            font-size: 22px; font-weight: 800; cursor: pointer; 
             box-shadow: 0 10px 25px rgba(76, 201, 240, 0.4);
         }
 
-        /* הכוכב הנסתר */
-        .hidden-trigger {
-            margin-top: 40px;
+        /* הכפתור הנסתר - עיגול בהיר בפינה */
+        .admin-trigger {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             text-decoration: none;
-            color: rgba(255,
+            color: white;
+            font-size: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            transition: 0.3s;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>באיזו עיר אתם גרים?</h1>
+        
+        <div class="field-group">
+            <select id="city">
+                <option>ירושלים</option>
+                <option>תל אביב</option>
+                <option>חיפה</option>
+                <option>באר שבע</option>
+                <option>קרית שמונה</option>
+                <option>צפת</option>
+                <option>טבריה</option>
+                <option>עפולה</option>
+                <option>נהריה</option>
+                <option>עכו</option>
+                <option>כרמיאל</option>
+                <option>קריות</option>
+                <option>נתניה</option>
+                <option>כפר סבא</option>
+                <option>רעננה</option>
+                <option>הרצליה</option>
+                <option>חדרה</option>
+                <option>פתח תקווה</option>
+                <option>רמת גן</option>
+                <option>גבעתיים</option>
+                <option>בני ברק</option>
+                <option>חולון</option>
+                <option>בת ים</option>
+                <option>ראשון לציון</option>
+                <option>נס ציונה</option>
+                <option>רחובות</option>
+                <option>מודיעין</option>
+                <option>בית שמש</option>
+                <option>אשדוד</option>
+                <option>אשקלון</option>
+                <option>שדרות</option>
+                <option>נתיבות</option>
+                <option>אופקים</option>
+                <option>ערד</option>
+                <option>דימונה</option>
+                <option>מצפה רמון</option>
+                <option>אילת</option>
+            </select>
+        </div>
+
+        <div class="field-group">
+            <label class="btn-file">
+                צלמו תמונה של הבובה שלכם
+                <input type="file" id="photo" accept="image/*">
+            </label>
+        </div>
+
+        <button class="send-btn" onclick="upload()">שלח למפה</button>
+    </div>
+
+    <a href="map.html" class="admin-trigger">★</a>
+
+    <script>
+        const firebaseConfig = { databaseURL: "https://bubot-mekomiot-default-rtdb.firebaseio.com" };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        function upload() {
+            const file = document.getElementById('photo').files[0];
+            const city = document.getElementById('city').value;
+            if (!file) return alert("אופס! שכחתם לבחור תמונה");
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                database.ref('uploads').push({
+                    city: city, image: e.target.result, time: Date.now()
+                }).then(() => { alert("איזה יופי! התמונה בדרך למפה"); });
+            };
+            reader.readAsDataURL(file);
+        }
+    </script>
+</body>
+</html>
