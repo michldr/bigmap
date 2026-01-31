@@ -3,139 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>העלאת יצירה - עולם הבובות</title>
+    <title>עולם הבובות - הרפתקה ישראלית</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;800&family=Varela+Round&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #ff4757;
-            --secondary-color: #2ed573;
-            --accent-color: #1e90ff;
-            --bg-gradient: linear-gradient(135deg, #70a1ff, #5352ed);
+            --soft-pink: #ff85a2;
+            --deep-pink: #f72585;
+            --bright-blue: #4cc9f0;
+            --soft-blue: #7209b7;
+            --pure-white: #ffffff;
         }
 
         body { 
             font-family: 'Varela Round', sans-serif; 
-            background: var(--bg-gradient); 
+            /* רקע משולב כחול וורוד בגרדיאנט אלכסוני */
+            background: linear-gradient(135deg, var(--bright-blue) 0%, var(--soft-pink) 100%);
             background-attachment: fixed;
             margin: 0;
             padding: 20px;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            color: white;
+            overflow-x: hidden;
+        }
+
+        /* בועות רקע לקישוט - נותן תחושת משחק */
+        body::before {
+            content: "";
+            position: absolute;
+            width: 300px; height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: -100px; left: -100px;
+            z-index: -1;
         }
 
         .container {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 30px;
-            border-radius: 30px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px); /* אפקט זכוכית הייטקי */
+            padding: 40px 30px;
+            border-radius: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
             width: 100%;
-            max-width: 400px;
-            border: 6px solid #ffde7d;
+            max-width: 420px;
+            border: 8px solid var(--pure-white);
+            text-align: center;
+            position: relative;
         }
 
         h1 { 
-            color: #333; 
-            font-size: 28px; 
-            font-weight: 800;
-            margin-bottom: 25px;
-            text-shadow: 1px 1px 0px #eee;
+            color: var(--deep-pink); 
+            font-size: 32px; 
+            font-weight: 900;
+            margin-bottom: 35px;
+            letter-spacing: -1px;
         }
 
         .field-group {
-            margin-bottom: 20px;
-            text-align: right;
+            margin-bottom: 25px;
+            position: relative;
         }
 
-        label {
-            display: block;
-            color: #555;
-            margin-bottom: 8px;
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        select, button { 
+        /* שדה בחירת עיר */
+        select { 
             width: 100%; 
-            padding: 15px; 
-            border-radius: 20px; 
+            padding: 18px; 
+            border-radius: 25px; 
             font-size: 18px; 
             font-family: 'Varela Round', sans-serif;
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-        }
-
-        select {
-            border: 3px solid #ddd;
-            background: white;
-            color: #333;
+            border: 3px solid var(--bright-blue);
+            background: var(--pure-white);
+            color: #444;
             cursor: pointer;
             appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: left 15px center;
-        }
-
-        /* עיצוב כפתור בחירת קובץ */
-        .file-upload-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-            width: 100%;
-        }
-
-        .btn-file {
-            background: white;
-            border: 3px dashed var(--accent-color);
-            color: var(--accent-color);
-            padding: 20px;
-            border-radius: 20px;
-            display: block;
-            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
             font-weight: bold;
         }
 
-        input[type=file] {
-            position: absolute;
-            left: 0;
-            top: 0;
-            opacity: 0;
-            cursor: pointer;
-            height: 100%;
-            width: 100%;
+        select:focus {
+            outline: none;
+            border-color: var(--deep-pink);
+            box-shadow: 0 0 15px rgba(247, 37, 133, 0.2);
         }
 
-        button.send-btn { 
-            background: #ff4757; 
-            color: white; 
-            border: none; 
+        /* שדה בחירת קובץ - עיצוב ורוד-לבן */
+        .btn-file {
+            background: var(--soft-pink);
+            color: var(--pure-white);
+            padding: 22px;
+            border-radius: 25px;
+            display: block;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 19px;
+            border: 4px solid var(--pure-white);
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(255, 133, 162, 0.3);
+        }
+
+        .btn-file:hover {
+            transform: scale(1.02);
+            background: var(--deep-pink);
+        }
+
+        input[type=file] { display: none; }
+
+        /* כפתור שליחה - עיצוב כחול עמוק והייטקי */
+        .send-btn { 
+            width: 100%;
+            padding: 20px;
+            border-radius: 25px;
+            background: var(--bright-blue); 
+            color: var(--pure-white); 
+            border: 4px solid var(--pure-white);
+            font-size: 22px;
             font-weight: 800; 
             cursor: pointer; 
-            box-shadow: 0 6px 0 #b33939;
-            margin-top: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            box-shadow: 0 10px 25px rgba(76, 201, 240, 0.4);
+            font-family: 'Varela Round', sans-serif;
         }
 
-        button.send-btn:active {
-            box-shadow: 0 2px 0 #b33939;
-            transform: translateY(4px);
+        .send-btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 4px 10px rgba(76, 201, 240, 0.4);
         }
 
-        .admin-link { 
-            margin-top: 30px; 
-            display: inline-block; 
-            color: #888; 
-            text-decoration: none; 
-            font-size: 12px;
+        /* הכפתור הנסתר שלך - צבע גוף הרקע כדי שיבלע */
+        .hidden-admin-link {
+            width: 60px;
+            height: 30px;
+            margin-top: 50px;
+            background: transparent;
+            border: none;
+            cursor: default;
+            display: block;
+            opacity: 0.1; /* כמעט בלתי נראה */
         }
     </style>
 </head>
 <body>
+
     <div class="container">
         <h1>באיזו עיר אתם גרים?</h1>
         
@@ -145,54 +158,60 @@
                 <option>תל אביב</option>
                 <option>חיפה</option>
                 <option>באר שבע</option>
-                <option>קרית שמונה</option>
-                <option>יישובי אצבע הגליל</option>
-                <option>צפת</option>
-                <option>כרמיאל</option>
-                <option>נהריה</option>
-                <option>עכו</option>
-                <option>טבריה</option>
-                <option>יישובי עמק יזרעאל</option>
-                <option>עפולה</option>
-                <option>קריות</option>
-                <option>יקנעם</option>
-                <option>זכרון יעקב</option>
-                <option>חדרה</option>
-                <option>נתניה</option>
-                <option>יישובי השרון</option>
-                <option>רעננה</option>
-                <option>כפר סבא</option>
-                <option>הרצליה</option>
-                <option>פתח תקווה</option>
-                <option>רמת גן</option>
-                <option>בני ברק</option>
-                <option>גבעתיים</option>
-                <option>חולון</option>
-                <option>בת ים</option>
-                <option>ראשון לציון</option>
-                <option>נס ציונה</option>
-                <option>רחובות</option>
-                <option>יישובי גזר והסביבה</option>
-                <option>רמלה</option>
-                <option>לוד</option>
-                <option>מודיעין</option>
-                <option>בית שמש</option>
-                <option>אשדוד</option>
-                <option>אשקלון</option>
-                <option>שדרות</option>
-                <option>יישובי עוטף עזה</option>
-                <option>נתיבות</option>
-                <option>אופקים</option>
-                <option>ערד</option>
-                <option>דימונה</option>
-                <option>יישובי הנגב</option>
-                <option>מצפה רמון</option>
-                <option>יישובי הערבה</option>
-                <option>אילת</option>
+                <optgroup label="צפון">
+                    <option>קרית שמונה</option>
+                    <option>יישובי אצבע הגליל</option>
+                    <option>צפת</option>
+                    <option>כרמיאל</option>
+                    <option>נהריה</option>
+                    <option>עכו</option>
+                    <option>טבריה</option>
+                    <option>יישובי עמק יזרעאל</option>
+                    <option>עפולה</option>
+                    <option>קריות</option>
+                    <option>יקנעם</option>
+                </optgroup>
+                <optgroup label="מרכז">
+                    <option>זכרון יעקב</option>
+                    <option>חדרה</option>
+                    <option>נתניה</option>
+                    <option>יישובי השרון</option>
+                    <option>רעננה</option>
+                    <option>כפר סבא</option>
+                    <option>הרצליה</option>
+                    <option>פתח תקווה</option>
+                    <option>רמת גן</option>
+                    <option>בני ברק</option>
+                    <option>גבעתיים</option>
+                    <option>חולון</option>
+                    <option>בת ים</option>
+                    <option>ראשון לציון</option>
+                    <option>נס ציונה</option>
+                    <option>רחובות</option>
+                    <option>יישובי גזר והסביבה</option>
+                    <option>רמלה</option>
+                    <option>לוד</option>
+                    <option>מודיעין</option>
+                    <option>בית שמש</option>
+                </optgroup>
+                <optgroup label="דרום">
+                    <option>אשדוד</option>
+                    <option>אשקלון</option>
+                    <option>שדרות</option>
+                    <option>יישובי עוטף עזה</option>
+                    <option>נתיבות</option>
+                    <option>אופקים</option>
+                    <option>ערד</option>
+                    <option>דימונה</option>
+                    <option>יישובי הנגב</option>
+                    <option>מצפה רמון</option>
+                    <option>יישובי הערבה</option>
+                    <option>אילת</option>
+                </optgroup>
             </select>
         </div>
 
-        <div class="field-group file-upload-wrapper">
+        <div class="field-group">
             <label class="btn-file">
                 צלמו תמונה של הבובה שלכם
                 <input type="file" id="photo" accept="image/*">
@@ -200,9 +219,9 @@
         </div>
 
         <button class="send-btn" onclick="upload()">שלח למפה</button>
-
-        <a href="map.html" class="admin-link">צפייה במפה</a>
     </div>
+
+    <a href="map.html" class="hidden-admin-link"></a>
 
     <script>
         const firebaseConfig = { databaseURL: "https://bubot-mekomiot-default-rtdb.firebaseio.com" };
