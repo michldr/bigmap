@@ -105,4 +105,42 @@
         "רמת גן": { left: 45.2, top: 37.8 },
         "גבעתיים": { left: 45.1, top: 38.5 },
         "בני ברק": { left: 45.8, top: 37.9 },
-        "חולון
+        "חולון": { left: 44.5, top: 39.8 },
+        "בת ים": { left: 43.8, top: 39.5 },
+        "ראשון לציון": { left: 44.8, top: 41.2 },
+        "נס ציונה": { left: 44.9, top: 42.5 },
+        "רחובות": { left: 45.1, top: 43.8 },
+        "מודיעין": { left: 49.5, top: 41.5 },
+        "בית שמש": { left: 48.5, top: 46.5 },
+        "אשדוד": { left: 41.6, top: 44.2 },
+        "אשקלון": { left: 39.5, top: 47.5 },
+        "שדרות": { left: 40.5, top: 49.5 },
+        "נתיבות": { left: 39.8, top: 52.1 },
+        "אופקים": { left: 41.0, top: 53.5 },
+        "ערד": { left: 51.5, top: 56.5 },
+        "דימונה": { left: 50.5, top: 60.5 },
+        "מצפה רמון": { left: 44.5, top: 71.2 },
+        "אילת": { left: 47.1, top: 91.4 }
+    };
+
+    database.ref('uploads').on('child_added', (snapshot) => {
+        const data = snapshot.val();
+        const coords = cityCoords[data.city];
+
+        if (coords) {
+            const layer = document.getElementById('photos-layer');
+            const div = document.createElement('div');
+            div.className = 'user-photo-wrapper';
+            div.style.left = coords.left + '%';
+            div.style.top = coords.top + '%';
+            
+            div.innerHTML = `
+                <img src="${data.image}">
+                <span class="city-name">אני מ${data.city}</span>
+            `;
+            layer.appendChild(div);
+        }
+    });
+</script>
+</body>
+</html>
