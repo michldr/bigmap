@@ -15,17 +15,17 @@
             --pure-white: #ffffff;
         }
 
-      body {
+body {
     font-family: 'Varela Round', sans-serif;
     margin: 0;
     padding: 0;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden; /* מונע גלילה מיותרת בטלוויזיה */
-    background-image: url('israel.map.png');
-    background-size: 100% 100%; /* זה ימתח את המפה בדיוק לגבולות המסך */
-    background-repeat: no-repeat;
-    background-position: center;
+    background: linear-gradient(135deg, var(--bright-blue) 0%, var(--soft-pink) 100%);
+    background-attachment: fixed;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
             padding: 20px;
             display: flex;
@@ -172,4 +172,5 @@
     </script>
 </body>
 </html>
+
 
